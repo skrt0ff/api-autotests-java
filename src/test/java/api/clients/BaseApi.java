@@ -1,5 +1,6 @@
 package api.clients;
 
+import api.logging.TestLogger;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
@@ -10,17 +11,29 @@ public abstract class BaseApi {
 
     protected abstract String basePath();
 
+    private final TestLogger logger;
+
+    protected BaseApi(TestLogger logger) {
+        this.logger = logger;
+    }
+
     public Response getAll() {
-        return given()
-                .baseUri(BASE_URL)
-                .when()
-                .get(basePath());
+        return sendGet(basePath());
     }
 
     public Response getById(int id) {
-        return given()
+        return sendGet(basePath() + "/" + id);
+    }
+
+    private Response sendGet(String path) {
+        logger.info("GET " + path);
+
+        Response response = given()
                 .baseUri(BASE_URL)
                 .when()
-                .get(basePath() + "/" + id);
+                .get(path);
+
+        logger.info("Status: " + response.getStatusCode());
+        return response;
     }
 }
