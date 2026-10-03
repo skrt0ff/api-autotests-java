@@ -1,5 +1,6 @@
 package api.clients;
 
+import api.config.Config;
 import api.logging.TestLogger;
 
 public class BookingApi extends BaseApi{
@@ -15,6 +16,6 @@ public class BookingApi extends BaseApi{
 
     @Override
     protected String baseUrl() {
-        return "https://restful-booker.herokuapp.com";
+        return Config.get("restfulbooker.baseUrl");
     }
 }

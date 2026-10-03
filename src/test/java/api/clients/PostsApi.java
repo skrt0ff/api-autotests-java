@@ -1,5 +1,6 @@
 package api.clients;
 
+import api.config.Config;
 import api.logging.TestLogger;
 
 public class PostsApi extends BaseApi{
@@ -15,6 +16,6 @@ public class PostsApi extends BaseApi{
 
     @Override
     protected String baseUrl() {
-        return "https://jsonplaceholder.typicode.com";
+        return Config.get("jsonplaceholder.baseUrl");
     }
 }
