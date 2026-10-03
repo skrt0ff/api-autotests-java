@@ -2,19 +2,19 @@ package api.clients;
 
 import api.logging.TestLogger;
 
-public class PostsApi extends BaseApi{
+public class BookingApi extends BaseApi{
 
-    public PostsApi(TestLogger logger) {
+    public BookingApi(TestLogger logger) {
         super(logger);
     }
 
     @Override
     protected String basePath() {
-        return "/posts";
+        return "/booking";
     }
 
     @Override
     protected String baseUrl() {
-        return "https://jsonplaceholder.typicode.com";
+        return "https://restful-booker.herokuapp.com";
     }
 }

@@ -7,11 +7,11 @@ import static io.restassured.RestAssured.given;
 
 public abstract class BaseApi {
 
-    private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    private final TestLogger logger;
 
     protected abstract String basePath();
 
-    private final TestLogger logger;
+    protected abstract String baseUrl();
 
     protected BaseApi(TestLogger logger) {
         this.logger = logger;
@@ -29,7 +29,7 @@ public abstract class BaseApi {
         logger.info("GET " + path);
 
         Response response = given()
-                .baseUri(BASE_URL)
+                .baseUri(baseUrl())
                 .when()
                 .get(path);
 
