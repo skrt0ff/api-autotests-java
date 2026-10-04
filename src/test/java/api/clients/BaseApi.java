@@ -1,6 +1,7 @@
 package api.clients;
 
 import api.logging.TestLogger;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
 import static io.restassured.RestAssured.given;
@@ -32,6 +33,20 @@ public abstract class BaseApi {
                 .baseUri(baseUrl())
                 .when()
                 .get(path);
+
+        logger.info("Status: " + response.getStatusCode());
+        return response;
+    }
+
+    protected Response sendPost(String path, Object body) {
+        logger.info("POST " + path);
+
+        Response response = given()
+                .baseUri(baseUrl())
+                .contentType(ContentType.JSON)
+                .body(body)
+                .when()
+                .post(path);
 
         logger.info("Status: " + response.getStatusCode());
         return response;
