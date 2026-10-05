@@ -51,4 +51,17 @@ public abstract class BaseApi {
         logger.info("Status: " + response.getStatusCode());
         return response;
     }
+
+    protected Response sendDelete(String path, String token) {
+        logger.info("DELETE " + path);
+
+        Response response = given()
+                .baseUri(baseUrl())
+                .cookie("token", token)
+                .when()
+                .delete(path);
+
+        logger.info("Status: " + response.getStatusCode());
+        return response;
+    }
 }

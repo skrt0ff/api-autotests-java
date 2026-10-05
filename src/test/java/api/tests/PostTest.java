@@ -1,6 +1,6 @@
 package api.tests;
 
-import api.models.Post;
+import api.models.post.Post;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

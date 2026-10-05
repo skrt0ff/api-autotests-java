@@ -60,4 +60,34 @@ public class BookingApiTest {
         assertTrue(createdBooking.bookingid() > 0);
         assertEquals(booking, createdBooking.booking());
     }
+
+    @Test
+    void getTokenReturnsNotEmptyToken() {
+        String token = bookingApi.getToken();
+        assertNotNull(token);
+        assertFalse(token.isBlank());
+    }
+
+    @Test
+    void deleteBookingReturns201() {
+        Booking booking = new Booking(
+                "test2",
+                "test2",
+                2,
+                false,
+                new BookingDates("2026-10-10", "2026-10-15"),
+                "test"
+        );
+
+        Response createResponse = bookingApi.create(booking);
+        assertEquals(200, createResponse.getStatusCode());
+        CreatedBooking createdBooking = createResponse.as(CreatedBooking.class);
+
+        String token = bookingApi.getToken();
+
+        Response deleteResponse = bookingApi.delete(createdBooking.bookingid(), token);
+        assertEquals(201, deleteResponse.getStatusCode());
+        Response getResponse = bookingApi.getById(createdBooking.bookingid());
+        assertEquals(404, getResponse.getStatusCode());
+    }
 }

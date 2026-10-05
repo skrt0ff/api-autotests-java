@@ -1,4 +1,4 @@
-package api.models;
+package api.models.post;
 
 public class Post {
     private final int userId;

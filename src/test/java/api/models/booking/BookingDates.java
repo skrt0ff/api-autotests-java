@@ -1,5 +1,7 @@
 package api.models.booking;
 
-public record BookingDates(String checkin, String checkout) {
-
+public record BookingDates(
+        String checkin,
+        String checkout
+) {
 }
