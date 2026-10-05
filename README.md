@@ -1,54 +1,54 @@
-# API Autotests (Java + REST Assured)
+# api-autotests-java
 
-Учебный проект: автотесты для REST API на Java. Цель — на практике разобраться
-с ООП, принципами проектирования и паттернами, строя небольшой тестовый фреймворк.
+Учебный проект по автотестированию REST API на Java. Цель: на живом примере разобраться в ООП, принципах проектирования, паттернах и написании API-тестов.
 
-> Проект учебный. Тесты ходят в публичные тренировочные API, данные там
-> «ненастоящие» (например, JSONPlaceholder не сохраняет созданные записи).
+Тесты работают только с открытыми демо-сервисами:
+- [JSONPlaceholder](https://jsonplaceholder.typicode.com) — публичный фейковый API для постов
+- [Restful-Booker](https://restful-booker.herokuapp.com) — API бронирований с авторизацией по токену
 
 ## Стек
 
 - Java 17
-- Gradle
+- Gradle (wrapper)
 - JUnit 5
-- REST Assured
-- Jackson
+- REST Assured 5
+- Jackson (сериализация и десериализация JSON)
 
 ## Запуск
 
-Нужны JDK 17+ и доступ в интернет.
-
-```
-./gradlew test
+```bash
+./gradlew cleanTest test
 ```
 
-## Структура
+Адреса серверов и данные для авторизации лежат в `src/test/resources/config.properties`.
+
+## Структура проекта
 
 ```
 src/test/java/api/
-├── models/    модели данных (Post)
-├── clients/   API-клиенты (BaseApi, PostsApi)
-├── logging/   логгеры (TestLogger, ConsoleLogger, InMemoryLogger)
-└── tests/     тесты
+├── builders/   BookingBuilder — сборка тестовых данных (паттерн Builder)
+├── clients/    BaseApi, PostsApi, BookingApi — клиенты API
+├── config/     Config — чтение настроек из config.properties
+├── logging/    TestLogger, ConsoleLogger, InMemoryLogger
+├── models/     модели запросов и ответов (record и классы)
+│   ├── auth/       AuthRequest, AuthResponse
+│   └── booking/    Booking, BookingDates, CreatedBooking
+└── tests/      PostsApiTest, BookingApiTest, ConfigTest, LoggerTest, ...
 ```
 
-## Где какой принцип ООП показан
+## Что покрыто тестами
 
-| Принцип | Где в проекте |
+- **Posts:** получение списка и одного поста, ответ 404 для несуществующего поста, проверка логирования запросов
+- **Booking:** получение списка и бронирования по id, создание, получение токена, удаление с проверкой, что бронирование исчезло
+- **Config и логгеры:** чтение настроек, ошибка при отсутствующем ключе, неизменяемость списка сообщений
+- **Билдер:** значения по умолчанию и переопределение полей
+
+## Где что из ООП и принципов
+
+| Тема | Где смотреть |
 |---|---|
-| Инкапсуляция | `Post` — приватные неизменяемые поля и проверки в конструкторе |
-| Абстракция | `BaseApi` скрывает URL и детали отправки запроса |
-| Абстрактный класс | `BaseApi` с абстрактным методом `basePath()` |
-| Наследование | `PostsApi` наследуют `BaseApi` |
-| Интерфейс | `TestLogger` и его реализации |
-| Полиморфизм | один код работает с любым `TestLogger` |
-| Внедрение зависимости | логгер передаётся в конструктор `BaseApi` |
-
-## Планы
-
-- [x] Основы ООП на примере API-клиентов
-- [ ] Restful-Booker: CRUD и авторизация
-- [ ] Преобразование JSON в Java-объекты
-- [ ] Request/Response Specification
-- [ ] Принципы SOLID, паттерны (Builder, Factory, Strategy)
-- [ ] Отчёты Allure, запуск в GitHub Actions
+| Инкапсуляция | `Post` (проверки в конструкторе, `private final`), `InMemoryLogger` (`List.copyOf`) |
+| Абстракция | `BaseApi` прячет URL и детали запросов, тест вызывает `getById(1)` |
+| Наследование | `PostsApi` и `BookingApi` наследуют `BaseApi` |
+| Абстрактный класс | `BaseApi` — общий код и состояние для семьи клиентов |
+| Интерфейс | `TestLogger` —
