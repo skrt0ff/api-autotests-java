@@ -1,5 +1,6 @@
 package api.tests;
 
+import api.builders.BookingBuilder;
 import api.clients.BaseApi;
 import api.clients.BookingApi;
 import api.logging.ConsoleLogger;
@@ -44,14 +45,7 @@ public class BookingApiTest {
 
     @Test
     void createBookingReturnsCreatedBooking() {
-        Booking booking = new Booking(
-                "test",
-                "test",
-                1,
-                true,
-                new BookingDates("2026-10-10", "2026-10-15"),
-                "test"
-        );
+        Booking booking = BookingBuilder.aBooking().withLastname("Ibragim").build();
 
         Response response = bookingApi.create(booking);
         assertEquals(200, response.getStatusCode());
@@ -70,14 +64,7 @@ public class BookingApiTest {
 
     @Test
     void deleteBookingReturns201() {
-        Booking booking = new Booking(
-                "test2",
-                "test2",
-                2,
-                false,
-                new BookingDates("2026-10-10", "2026-10-15"),
-                "test"
-        );
+        Booking booking = BookingBuilder.aBooking().withFirstname("Kim").build();
 
         Response createResponse = bookingApi.create(booking);
         assertEquals(200, createResponse.getStatusCode());
@@ -90,4 +77,6 @@ public class BookingApiTest {
         Response getResponse = bookingApi.getById(createdBooking.bookingid());
         assertEquals(404, getResponse.getStatusCode());
     }
+
+
 }
