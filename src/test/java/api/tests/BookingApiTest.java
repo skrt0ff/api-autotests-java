@@ -1,13 +1,12 @@
 package api.tests;
 
 import api.builders.BookingBuilder;
-import api.clients.BaseApi;
 import api.clients.BookingApi;
 import api.logging.ConsoleLogger;
 import api.models.booking.Booking;
-import api.models.booking.BookingDates;
 import api.models.booking.CreatedBooking;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,10 +15,19 @@ import static org.junit.jupiter.api.Assertions.*;
 public class BookingApiTest {
 
     private BookingApi bookingApi;
+    private Integer createdBookingId;
 
     @BeforeEach
     void setUp() {
         bookingApi = new BookingApi(new ConsoleLogger());
+    }
+
+    @AfterEach
+    void cleanUp() {
+        if (createdBookingId != null) {
+            String token = bookingApi.getToken();
+            bookingApi.delete(createdBookingId, token);
+        }
     }
 
     @Test
@@ -51,6 +59,7 @@ public class BookingApiTest {
         assertEquals(200, response.getStatusCode());
 
         CreatedBooking createdBooking = response.as(CreatedBooking.class);
+        createdBookingId = createdBooking.bookingid();
         assertTrue(createdBooking.bookingid() > 0);
         assertEquals(booking, createdBooking.booking());
     }
@@ -77,6 +86,5 @@ public class BookingApiTest {
         Response getResponse = bookingApi.getById(createdBooking.bookingid());
         assertEquals(404, getResponse.getStatusCode());
     }
-
 
 }

@@ -12,7 +12,7 @@ public class BookingBuilderTest {
         Booking booking = BookingBuilder.aBooking().withLastname("Ibragim").build();
 
         assertEquals("Ibragim", booking.lastname());
-        assertEquals("TestFN", booking.firstname());   // остальное осталось по умолчанию
+        assertEquals("TestFN", booking.firstname());
     }
 
     @Test
