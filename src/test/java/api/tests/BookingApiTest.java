@@ -87,4 +87,34 @@ public class BookingApiTest {
         assertEquals(404, getResponse.getStatusCode());
     }
 
+    @Test
+    void updateBookingReplacesData() {
+        Booking originalBooking = BookingBuilder.aBooking()
+                .withFirstname("Kim")
+                .withLastname("Kim")
+                .build();
+
+        Response createResponse = bookingApi.create(originalBooking);
+        assertEquals(200, createResponse.getStatusCode());
+
+        CreatedBooking createdBooking = createResponse.as(CreatedBooking.class);
+        createdBookingId = createdBooking.bookingid();
+
+        String token = bookingApi.getToken();
+
+        Booking newBooking = BookingBuilder.aBooking()
+                .withFirstname("Update")
+                .withLastname("Update")
+                .build();
+
+        Response updateResponse = bookingApi.update(createdBookingId, newBooking, token);
+        assertEquals(200, updateResponse.getStatusCode());
+
+        Booking updated = updateResponse.as(Booking.class);
+        assertEquals(newBooking, updated);
+
+        Booking saved = bookingApi.getById(createdBookingId).as(Booking.class);
+        assertEquals(newBooking, saved);
+    }
+
 }

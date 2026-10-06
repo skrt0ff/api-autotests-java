@@ -23,7 +23,7 @@ public abstract class BaseApi {
     private RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
                 .setBaseUri(baseUrl())
-                .setAccept(ContentType.JSON)
+                .setAccept("application/json")
                 .build();
     }
 
@@ -52,10 +52,25 @@ public abstract class BaseApi {
 
         Response response = given()
                 .spec(requestSpec())
-                .contentType(ContentType.JSON)
+                .contentType(ContentType.JSON.withCharset("UTF-8"))
                 .body(body)
                 .when()
                 .post(path);
+
+        logger.info("Status: " + response.getStatusCode());
+        return response;
+    }
+
+    protected Response sendPut(String path, Object body, String token) {
+        logger.info("PUT " + path);
+
+        Response response = given()
+                .spec(requestSpec())
+                .contentType(ContentType.JSON.withCharset("UTF-8"))
+                .cookie("token", token)
+                .body(body)
+                .when()
+                .put(path);
 
         logger.info("Status: " + response.getStatusCode());
         return response;

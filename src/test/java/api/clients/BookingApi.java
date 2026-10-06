@@ -38,6 +38,10 @@ public class BookingApi extends BaseApi{
         return sendPost(basePath(), booking);
     }
 
+    public Response update(int id, Booking booking, String token) {
+        return sendPut(basePath() + "/" + id, booking, token);
+    }
+
     public Response delete(int id, String token) {
         return sendDelete(basePath() + "/" + id, token);
     }
