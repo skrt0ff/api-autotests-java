@@ -1,8 +1,10 @@
 package api.clients;
 
 import api.logging.TestLogger;
+import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import static io.restassured.RestAssured.given;
 
@@ -18,6 +20,13 @@ public abstract class BaseApi {
         this.logger = logger;
     }
 
+    private RequestSpecification requestSpec() {
+        return new RequestSpecBuilder()
+                .setBaseUri(baseUrl())
+                .setAccept(ContentType.JSON)
+                .build();
+    }
+
     public Response getAll() {
         return sendGet(basePath());
     }
@@ -30,7 +39,7 @@ public abstract class BaseApi {
         logger.info("GET " + path);
 
         Response response = given()
-                .baseUri(baseUrl())
+                .spec(requestSpec())
                 .when()
                 .get(path);
 
@@ -42,7 +51,7 @@ public abstract class BaseApi {
         logger.info("POST " + path);
 
         Response response = given()
-                .baseUri(baseUrl())
+                .spec(requestSpec())
                 .contentType(ContentType.JSON)
                 .body(body)
                 .when()
@@ -56,7 +65,7 @@ public abstract class BaseApi {
         logger.info("DELETE " + path);
 
         Response response = given()
-                .baseUri(baseUrl())
+                .spec(requestSpec())
                 .cookie("token", token)
                 .when()
                 .delete(path);
