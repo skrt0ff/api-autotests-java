@@ -1,8 +1,8 @@
 package api.clients;
 
 import api.logging.TestLogger;
+import api.specs.RequestSpecs;
 import io.restassured.builder.RequestSpecBuilder;
-import io.restassured.http.ContentType;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -22,13 +22,16 @@ public abstract class BaseApi {
     }
 
     // Общая точка отправки: лог, запрос, лог статуса.
-    // Тело передаём отдельно: при склейке спецификаций оно теряется.
-    private Response send(Method method, String path, RequestSpecification extraSpec, Object body) {
+    // specs применяются по очереди; общая requestSpec() идёт последней, чтобы адрес сервера
+    // не перезаписался. Тело добавляется отдельно: при склейке спецификаций оно теряется.
+    private Response send(Method method, String path, Object body, RequestSpecification... specs) {
         logger.info(method + " " + path);
 
-        RequestSpecification request = given()
-                .spec(extraSpec)
-                .spec(requestSpec());
+        RequestSpecification request = given();
+        for (RequestSpecification spec : specs) {
+            request.spec(spec);
+        }
+        request.spec(requestSpec());
 
         if (body != null) {
             request.body(body);
@@ -42,7 +45,6 @@ public abstract class BaseApi {
         return response;
     }
 
-    // Общее для всех запросов. Применяется последним, чтобы не потерять адрес сервера.
     // Accept строкой: список значений вызывает 418 у Restful-Booker.
     private RequestSpecification requestSpec() {
         return new RequestSpecBuilder()
@@ -60,40 +62,22 @@ public abstract class BaseApi {
     }
 
     private Response sendGet(String path) {
-        return send(Method.GET, path, new RequestSpecBuilder().build(), null);
+        return send(Method.GET, path, null, RequestSpecs.empty());
     }
 
     protected Response sendPost(String path, Object body) {
-        RequestSpecification spec = new RequestSpecBuilder()
-                .setContentType(ContentType.JSON.withCharset("UTF-8"))
-                .build();
-
-        return send(Method.POST, path, spec, body);
+        return send(Method.POST, path, body, RequestSpecs.json());
     }
 
     protected Response sendPut(String path, Object body, String token) {
-        RequestSpecification spec = new RequestSpecBuilder()
-                .setContentType(ContentType.JSON.withCharset("UTF-8"))
-                .addCookie("token", token)
-                .build();
-
-        return send(Method.PUT, path, spec, body);
+        return send(Method.PUT, path, body, RequestSpecs.json(), RequestSpecs.authorized(token));
     }
 
     protected Response sendPatch(String path, Object body, String token) {
-        RequestSpecification spec = new RequestSpecBuilder()
-                .setContentType(ContentType.JSON.withCharset("UTF-8"))
-                .addCookie("token", token)
-                .build();
-
-        return send(Method.PATCH, path, spec, body);
+        return send(Method.PATCH, path, body, RequestSpecs.json(), RequestSpecs.authorized(token));
     }
 
     protected Response sendDelete(String path, String token) {
-        RequestSpecification spec = new RequestSpecBuilder()
-                .addCookie("token", token)
-                .build();
-
-        return send(Method.DELETE, path, spec, null);
+        return send(Method.DELETE, path, null, RequestSpecs.authorized(token));
     }
 }
