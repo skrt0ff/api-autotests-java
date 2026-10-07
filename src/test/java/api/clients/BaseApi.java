@@ -76,6 +76,21 @@ public abstract class BaseApi {
         return response;
     }
 
+    protected Response sendPatch(String path, Object body, String token) {
+        logger.info("PATCH " + path);
+
+        Response response = given()
+                .spec(requestSpec())
+                .contentType(ContentType.JSON.withCharset("UTF-8"))
+                .cookie("token", token)
+                .body(body)
+                .when()
+                .patch(path);
+
+        logger.info("Status: " + response.getStatusCode());
+        return response;
+    }
+
     protected Response sendDelete(String path, String token) {
         logger.info("DELETE " + path);
 

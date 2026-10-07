@@ -10,6 +10,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BookingApiTest {
@@ -115,6 +117,30 @@ public class BookingApiTest {
 
         Booking saved = bookingApi.getById(createdBookingId).as(Booking.class);
         assertEquals(newBooking, saved);
+    }
+
+    @Test
+    void partialUpdateChangesOnlyGivenField() {
+        Booking originalBooking = BookingBuilder.aBooking()
+                .withFirstname("Kim")
+                .withLastname("Kim")
+                .withTotalprice(1)
+                .build();
+
+        Response createResponse = bookingApi.create(originalBooking);
+        assertEquals(200, createResponse.getStatusCode());
+
+        CreatedBooking createdBooking = createResponse.as(CreatedBooking.class);
+        createdBookingId = createdBooking.bookingid();
+
+        String token = bookingApi.getToken();
+        Response partialUpdateResponse = bookingApi.partialUpdate(createdBookingId, Map.of("firstname", "Rodion"), token);
+        assertEquals(200, partialUpdateResponse.getStatusCode());
+
+        Booking updated = partialUpdateResponse.as(Booking.class);
+        assertEquals("Rodion", updated.firstname());
+        assertEquals(createdBooking.booking().lastname(), updated.lastname());
+        assertEquals(createdBooking.booking().totalprice(), updated.totalprice());
     }
 
 }

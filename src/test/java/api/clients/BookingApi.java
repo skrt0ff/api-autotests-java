@@ -7,6 +7,8 @@ import api.models.auth.AuthResponse;
 import api.models.booking.Booking;
 import io.restassured.response.Response;
 
+import java.util.Map;
+
 public class BookingApi extends BaseApi{
 
     public BookingApi(TestLogger logger) {
@@ -40,6 +42,10 @@ public class BookingApi extends BaseApi{
 
     public Response update(int id, Booking booking, String token) {
         return sendPut(basePath() + "/" + id, booking, token);
+    }
+
+    public Response partialUpdate(int id, Map<String, Object> fields, String token) {
+        return sendPatch(basePath() + "/" + id, fields, token);
     }
 
     public Response delete(int id, String token) {
