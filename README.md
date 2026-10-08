@@ -71,8 +71,8 @@ src/test/java/api/
 - [x] Конфигурация через `.properties`
 - [x] POST, DELETE и авторизация по токену
 - [x] Builder для тестовых данных
-- [ ] Уборка за тестами через `@AfterEach`
-- [ ] `RequestSpecification` и устранение дублирования в `BaseApi`
+- [x] Уборка за тестами через `@AfterEach`
+- [x] `RequestSpecification` и устранение дублирования в `BaseApi`
 - [ ] PUT и PATCH
 - [ ] Разбор кода по принципам SOLID
 - [ ] Отчёты Allure
