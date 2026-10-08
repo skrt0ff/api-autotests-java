@@ -1,36 +1,16 @@
 package api.tests;
 
 import api.builders.BookingBuilder;
-import api.clients.BookingApi;
-import api.logging.ConsoleLogger;
 import api.models.booking.Booking;
 import api.models.booking.CreatedBooking;
 import io.restassured.response.Response;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BookingApiTest {
-
-    private BookingApi bookingApi;
-    private Integer createdBookingId;
-
-    @BeforeEach
-    void setUp() {
-        bookingApi = new BookingApi(new ConsoleLogger());
-    }
-
-    @AfterEach
-    void cleanUp() {
-        if (createdBookingId != null) {
-            String token = bookingApi.getToken();
-            bookingApi.delete(createdBookingId, token);
-        }
-    }
+public class BookingApiTest extends BaseBookingTest {
 
     @Test
     void getAllBookingsReturns200AndNotEmptyList() {
@@ -61,7 +41,7 @@ public class BookingApiTest {
         assertEquals(200, response.getStatusCode());
 
         CreatedBooking createdBooking = response.as(CreatedBooking.class);
-        createdBookingId = createdBooking.bookingid();
+        registerForCleanup(createdBooking.bookingid());
         assertTrue(createdBooking.bookingid() > 0);
         assertEquals(booking, createdBooking.booking());
     }
@@ -69,6 +49,7 @@ public class BookingApiTest {
     @Test
     void getTokenReturnsNotEmptyToken() {
         String token = bookingApi.getToken();
+
         assertNotNull(token);
         assertFalse(token.isBlank());
     }
@@ -85,6 +66,7 @@ public class BookingApiTest {
 
         Response deleteResponse = bookingApi.delete(createdBooking.bookingid(), token);
         assertEquals(201, deleteResponse.getStatusCode());
+
         Response getResponse = bookingApi.getById(createdBooking.bookingid());
         assertEquals(404, getResponse.getStatusCode());
     }
@@ -95,27 +77,23 @@ public class BookingApiTest {
                 .withFirstname("Kim")
                 .withLastname("Kim")
                 .build();
-
-        Response createResponse = bookingApi.create(originalBooking);
-        assertEquals(200, createResponse.getStatusCode());
-
-        CreatedBooking createdBooking = createResponse.as(CreatedBooking.class);
-        createdBookingId = createdBooking.bookingid();
+        CreatedBooking createdBooking = createBooking(originalBooking);
 
         String token = bookingApi.getToken();
 
         Booking newBooking = BookingBuilder.aBooking()
                 .withFirstname("Update")
                 .withLastname("Update")
+                .withTotalprice(999)
                 .build();
 
-        Response updateResponse = bookingApi.update(createdBookingId, newBooking, token);
+        Response updateResponse = bookingApi.update(createdBooking.bookingid(), newBooking, token);
         assertEquals(200, updateResponse.getStatusCode());
 
         Booking updated = updateResponse.as(Booking.class);
         assertEquals(newBooking, updated);
 
-        Booking saved = bookingApi.getById(createdBookingId).as(Booking.class);
+        Booking saved = bookingApi.getById(createdBooking.bookingid()).as(Booking.class);
         assertEquals(newBooking, saved);
     }
 
@@ -126,21 +104,17 @@ public class BookingApiTest {
                 .withLastname("Kim")
                 .withTotalprice(1)
                 .build();
-
-        Response createResponse = bookingApi.create(originalBooking);
-        assertEquals(200, createResponse.getStatusCode());
-
-        CreatedBooking createdBooking = createResponse.as(CreatedBooking.class);
-        createdBookingId = createdBooking.bookingid();
+        CreatedBooking createdBooking = createBooking(originalBooking);
 
         String token = bookingApi.getToken();
-        Response partialUpdateResponse = bookingApi.partialUpdate(createdBookingId, Map.of("firstname", "Rodion"), token);
-        assertEquals(200, partialUpdateResponse.getStatusCode());
 
-        Booking updated = partialUpdateResponse.as(Booking.class);
+        Response patchResponse = bookingApi.partialUpdate(
+                createdBooking.bookingid(), Map.of("firstname", "Rodion"), token);
+        assertEquals(200, patchResponse.getStatusCode());
+
+        Booking updated = patchResponse.as(Booking.class);
         assertEquals("Rodion", updated.firstname());
         assertEquals(createdBooking.booking().lastname(), updated.lastname());
         assertEquals(createdBooking.booking().totalprice(), updated.totalprice());
     }
-
 }
