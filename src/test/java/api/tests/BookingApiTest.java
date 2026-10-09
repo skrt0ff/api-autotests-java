@@ -1,10 +1,14 @@
 package api.tests;
 
 import api.builders.BookingBuilder;
+import api.config.Config;
+import api.models.auth.AuthRequest;
 import api.models.booking.Booking;
 import api.models.booking.CreatedBooking;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
@@ -69,6 +73,38 @@ public class BookingApiTest extends BaseBookingTest {
 
         Response getResponse = bookingApi.getById(createdBooking.bookingid());
         assertEquals(404, getResponse.getStatusCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"", "invalid", "0123"})
+    void deleteWithoutValidTokenReturns403(String invalidToken) {
+        CreatedBooking createdBooking = createBooking(BookingBuilder.aBooking().build());
+        int id = createdBooking.bookingid();
+
+        Response response = bookingApi.delete(id, invalidToken);
+        assertEquals(403, response.getStatusCode());
+        assertEquals(200, bookingApi.getById(id).getStatusCode());
+    }
+
+    @Test
+    void getNonExistingBookingReturns404() {
+        Response response = bookingApi.getById(Integer.MAX_VALUE);
+
+        assertEquals(404, response.getStatusCode());
+    }
+
+    @Test
+    void authWithBadCredentialsReturnsReason() {
+        AuthRequest badRequest = new AuthRequest(
+                Config.get("restfulbooker.username"),
+                "wrong-password");
+
+        Response response = bookingApi.auth(badRequest);
+
+        assertEquals(200, response.getStatusCode());
+        assertEquals("Bad credentials", response.jsonPath().getString("reason"));
+
+        assertNull(response.jsonPath().getString("token"));
     }
 
     @Test

@@ -25,15 +25,17 @@ public class BookingApi extends BaseApi{
         return Config.get("restfulbooker.baseUrl");
     }
 
+    public Response auth(AuthRequest request) {
+        return sendPost("/auth", request);
+    }
+
     public String getToken() {
         AuthRequest request = new AuthRequest(
                 Config.get("restfulbooker.username"),
                 Config.get("restfulbooker.password")
         );
 
-        Response response = sendPost("/auth", request);
-
-        return response.as(AuthResponse.class).token();
+        return auth(request).as(AuthResponse.class).token();
     }
 
     public Response create(Booking booking) {
