@@ -20,7 +20,7 @@
 ./gradlew cleanTest test
 ```
 
-Адреса серверов и данные для авторизации лежат в `src/test/resources/config.properties`.
+Адреса серверов и публичные демо-учётные данные Restful-Booker (из документации сервиса) лежат в `src/test/resources/config.properties`.
 
 ## Структура проекта
 
@@ -33,13 +33,15 @@ src/test/java/api/
 ├── models/     модели запросов и ответов (record и классы)
 │   ├── auth/       AuthRequest, AuthResponse
 │   └── booking/    Booking, BookingDates, CreatedBooking
-└── tests/      PostsApiTest, BookingApiTest, ConfigTest, LoggerTest, ...
+├── specs/      RequestSpecs — готовые RequestSpecification (JSON, токен)
+└── tests/      BaseBookingTest (фикстуры), BookingApiTest, PostsApiTest, ConfigTest, LoggerTest, PostTest
 ```
 
 ## Что покрыто тестами
 
 - **Posts:** получение списка и одного поста, ответ 404 для несуществующего поста, проверка логирования запросов
-- **Booking:** получение списка и бронирования по id, создание, получение токена, удаление с проверкой, что бронирование исчезло
+- **Booking:** получение списка и бронирования по id, создание, получение токена, удаление с проверкой, что бронирование исчезло, полное (PUT) и частичное (PATCH) обновление с проверкой через GET
+- **Негативные сценарии:** удаление с неверным токеном (параметризованный тест), несуществующая бронь (404), неверные учётные данные (`reason: Bad credentials`)
 - **Config и логгеры:** чтение настроек, ошибка при отсутствующем ключе, неизменяемость списка сообщений
 - **Билдер:** значения по умолчанию и переопределение полей
 
@@ -57,12 +59,23 @@ src/test/java/api/
 | Композиция | `Booking` содержит `BookingDates` |
 | Open/Closed | новый сервис добавляется новым клиентом, `BaseApi` не меняется |
 | Паттерн Builder | `BookingBuilder` |
+| Фикстуры и наследование в тестах | `BaseBookingTest`: `@BeforeEach` создаёт клиент, `@AfterEach` удаляет созданные брони |
+| DRY | `RequestSpecs` и единый метод `send` в `BaseApi` вместо копипасты |
+| Параметризованные тесты | `deleteWithoutValidTokenReturns403` (`@ParameterizedTest` + `@ValueSource`) |
 
 ## Принципы, которых придерживается проект
 
 - Тесты создают свои данные и не зависят от чужих id на общем сервере
 - Секреты и токены не хранятся в репозитории
 - Каждый тест проверяет что-то, что сломалось бы при ошибке в коде
+
+## Известные компромиссы
+
+Осознанно оставлено без изменений (YAGNI), пересмотрю при росте проекта:
+
+- `BaseBookingTest` создаёт `ConsoleLogger` напрямую (Dependency Inversion): логгер пока один
+- `getAll` и `getById` лежат в `BaseApi` (Liskov / Interface Segregation): оба клиента их используют
+- `BaseApi.send` совмещает сборку запроса, логирование и отправку (Single Responsibility): логирование планирую вынести в фильтр REST Assured вместе с Allure
 
 ## Планы
 
@@ -73,7 +86,8 @@ src/test/java/api/
 - [x] Builder для тестовых данных
 - [x] Уборка за тестами через `@AfterEach`
 - [x] `RequestSpecification` и устранение дублирования в `BaseApi`
-- [ ] PUT и PATCH
-- [ ] Разбор кода по принципам SOLID
+- [x] PUT и PATCH
+- [x] Негативные тесты и параметризация
+- [x] Разбор кода по принципам SOLID
 - [ ] Отчёты Allure
 - [ ] Запуск тестов в GitHub Actions
