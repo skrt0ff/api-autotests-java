@@ -2,6 +2,7 @@ package api.clients;
 
 import api.logging.TestLogger;
 import api.specs.RequestSpecs;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.Method;
 import io.restassured.response.Response;
@@ -50,6 +51,7 @@ public abstract class BaseApi {
         return new RequestSpecBuilder()
                 .setBaseUri(baseUrl())
                 .setAccept("application/json")
+                .addFilter(new AllureRestAssured())
                 .build();
     }
 
