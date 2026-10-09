@@ -1,3 +1,5 @@
+![Tests](https://github.com/skrt0ff/api-autotests-java/actions/workflows/tests.yml/badge.svg)
+
 # api-autotests-java
 
 Учебный проект по автотестированию REST API на Java. Цель: на живом примере разобраться в ООП, принципах проектирования, паттернах и написании API-тестов.
@@ -93,4 +95,4 @@ src/test/java/api/
 - [x] Негативные тесты и параметризация
 - [x] Разбор кода по принципам SOLID
 - [x] Отчёты Allure
-- [ ] Запуск тестов в GitHub Actions
+- [x] Запуск тестов в GitHub Actions
