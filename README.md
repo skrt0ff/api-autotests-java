@@ -16,8 +16,11 @@
 
 ## Запуск
 
+Отчёт Allure (нужен установленный [Allure CLI](https://allurereport.org)):
+
 ```bash
 ./gradlew cleanTest test
+allure serve build/allure-results
 ```
 
 Адреса серверов и публичные демо-учётные данные Restful-Booker (из документации сервиса) лежат в `src/test/resources/config.properties`.
@@ -89,5 +92,5 @@ src/test/java/api/
 - [x] PUT и PATCH
 - [x] Негативные тесты и параметризация
 - [x] Разбор кода по принципам SOLID
-- [ ] Отчёты Allure
+- [x] Отчёты Allure
 - [ ] Запуск тестов в GitHub Actions

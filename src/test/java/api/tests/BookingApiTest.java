@@ -5,7 +5,10 @@ import api.config.Config;
 import api.models.auth.AuthRequest;
 import api.models.booking.Booking;
 import api.models.booking.CreatedBooking;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import io.restassured.response.Response;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -14,9 +17,12 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@Epic("Restful-Booker")
+@Feature("Бронирования")
 public class BookingApiTest extends BaseBookingTest {
 
     @Test
+    @DisplayName("Список броней возвращается и не пустой")
     void getAllBookingsReturns200AndNotEmptyList() {
         Response response = bookingApi.getAll();
 
@@ -25,6 +31,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Бронь по id возвращается с заполненными данными")
     void getBookingByIdReturnsBooking() {
         int id = bookingApi.getAll().jsonPath().getInt("[0].bookingid");
 
@@ -38,6 +45,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Создание брони возвращает id и те же данные, что отправили")
     void createBookingReturnsCreatedBooking() {
         Booking booking = BookingBuilder.aBooking().withLastname("Ibragim").build();
 
@@ -51,6 +59,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Токен авторизации выдаётся и не пустой")
     void getTokenReturnsNotEmptyToken() {
         String token = bookingApi.getToken();
 
@@ -59,6 +68,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Удаление брони возвращает 201, после чего бронь не находится")
     void deleteBookingReturns201() {
         Booking booking = BookingBuilder.aBooking().withFirstname("Kim").build();
 
@@ -75,7 +85,8 @@ public class BookingApiTest extends BaseBookingTest {
         assertEquals(404, getResponse.getStatusCode());
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(name = "токен: [{0}]")
+    @DisplayName("Удаление с неверным токеном возвращает 403, бронь остаётся")
     @ValueSource(strings = {"", "invalid", "0123"})
     void deleteWithoutValidTokenReturns403(String invalidToken) {
         CreatedBooking createdBooking = createBooking(BookingBuilder.aBooking().build());
@@ -87,6 +98,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Несуществующая бронь возвращает 404")
     void getNonExistingBookingReturns404() {
         Response response = bookingApi.getById(Integer.MAX_VALUE);
 
@@ -94,6 +106,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Неверный пароль: 200 и причина «Bad credentials», токена нет")
     void authWithBadCredentialsReturnsReason() {
         AuthRequest badRequest = new AuthRequest(
                 Config.get("restfulbooker.username"),
@@ -108,6 +121,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Полное обновление (PUT) заменяет все данные брони")
     void updateBookingReplacesData() {
         Booking originalBooking = BookingBuilder.aBooking()
                 .withFirstname("Kim")
@@ -134,6 +148,7 @@ public class BookingApiTest extends BaseBookingTest {
     }
 
     @Test
+    @DisplayName("Частичное обновление (PATCH) меняет только переданное поле")
     void partialUpdateChangesOnlyGivenField() {
         Booking originalBooking = BookingBuilder.aBooking()
                 .withFirstname("Kim")

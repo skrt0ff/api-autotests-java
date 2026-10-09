@@ -3,6 +3,8 @@ package api.tests;
 import api.clients.PostsApi;
 import api.logging.ConsoleLogger;
 import api.logging.InMemoryLogger;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,8 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Epic("JSONPlaceholder")
+@Feature("Посты")
 public class PostsApiTest {
 
     private PostsApi postsApi;
