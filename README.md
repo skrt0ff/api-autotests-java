@@ -40,6 +40,11 @@ src/test/java/api/
 │   └── booking/    Booking, BookingDates, CreatedBooking
 ├── specs/      RequestSpecs — готовые RequestSpecification (JSON, токен)
 └── tests/      BaseBookingTest (фикстуры), BookingApiTest, PostsApiTest, ConfigTest, LoggerTest, PostTest
+
+src/test/resources/
+├── config.properties   настройки и публичные демо-данные
+├── allure.properties   папка результатов Allure
+└── schemas/            JSON-схемы ответов (booking.json, post.json)
 ```
 
 ## Что покрыто тестами
@@ -49,6 +54,7 @@ src/test/java/api/
 - **Негативные сценарии:** удаление с неверным токеном (параметризованный тест), несуществующая бронь (404), неверные учётные данные (`reason: Bad credentials`)
 - **Config и логгеры:** чтение настроек, ошибка при отсутствующем ключе, неизменяемость списка сообщений
 - **Билдер:** значения по умолчанию и переопределение полей
+- **Контракт ответов:** проверка структуры по JSON Schema для брони и поста (`src/test/resources/schemas`)
 
 ## Где что из ООП и принципов
 
@@ -96,3 +102,4 @@ src/test/java/api/
 - [x] Разбор кода по принципам SOLID
 - [x] Отчёты Allure
 - [x] Запуск тестов в GitHub Actions
+- [x] Проверка структуры ответов (JSON Schema)

@@ -7,10 +7,12 @@ import io.qameta.allure.Epic;
 import io.qameta.allure.Feature;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Epic("JSONPlaceholder")
@@ -22,6 +24,15 @@ public class PostsApiTest {
     @BeforeEach
     void setUp() {
         postsApi = new PostsApi(new ConsoleLogger());
+    }
+
+    @Test
+    @DisplayName("Структура поста соответствует схеме")
+    void getPostMatchesSchema() {
+        Response response = postsApi.getById(1);
+
+        response.then().assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/post.json"));
     }
 
     @Test

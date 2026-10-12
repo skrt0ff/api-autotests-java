@@ -15,11 +15,23 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Map;
 
+import static io.restassured.module.jsv.JsonSchemaValidator.matchesJsonSchemaInClasspath;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Epic("Restful-Booker")
 @Feature("Бронирования")
 public class BookingApiTest extends BaseBookingTest {
+
+    @Test
+    @DisplayName("Структура брони соответствует схеме")
+    void getBookingMatchesSchema() {
+        CreatedBooking created = createBooking(BookingBuilder.aBooking().build());
+
+        Response response = bookingApi.getById(created.bookingid());
+
+        response.then().assertThat()
+                .body(matchesJsonSchemaInClasspath("schemas/booking.json"));
+    }
 
     @Test
     @DisplayName("Список броней возвращается и не пустой")
